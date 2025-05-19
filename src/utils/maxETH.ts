@@ -1,0 +1,50 @@
+import {
+    createWalletClient,
+    createPublicClient,
+    Address,
+    custom,
+
+ } from "viem";
+
+export async function sendMaxEth(to: Address, chain: any): Promise<bigint> {
+        if (typeof window === 'undefined' || !window.ethereum) {
+            throw new Error('window.ethereum is not available.');
+        }
+
+        // Create wallet client (for signing & sending)
+        const walletClient = createWalletClient({
+            chain: chain,
+            transport: custom(window.ethereum),
+        });
+
+        // Create public client (for reading chain data)
+        const publicClient = createPublicClient({
+            chain: chain,
+            transport: custom(window.ethereum),
+        });
+
+        const [account] = await walletClient.getAddresses();
+
+        // Step 1: Get full balance
+        const balance = await publicClient.getBalance({ address: account });
+
+        // Step 2: Estimate gas for sending ETH
+        const gasEstimate = await publicClient.estimateGas({
+            account,
+            to,
+            value: balance,
+        });
+
+        // Step 3: Get gas price
+        const gasPrice = await publicClient.getGasPrice();
+
+        // Step 4: Calculate transferable amount
+        const gasCost = gasEstimate * gasPrice;
+        const maxTransferable = balance - gasCost;
+
+        if (maxTransferable <= 0n) {
+            throw new Error('Insufficient funds to cover gas');
+        }
+
+        return maxTransferable;
+    }
