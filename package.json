@@ -26,5 +26,13 @@
   "directories": {
     "test": "test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KENILSHAHH/superSDK.git"
+  },
+  "bugs": {
+    "url": "https://github.com/KENILSHAHH/superSDK/issues"
+  },
+  "homepage": "https://github.com/KENILSHAHH/superSDK#readme",
   "description": ""
 }

@@ -1,3 +1,3 @@
-import { ChainConfig } from "../types";
-export declare const defaultChains: ChainConfig[];
+import { Chain } from "viem";
+export declare const defaultChains: Chain[];
 //# sourceMappingURL=chains.d.ts.map

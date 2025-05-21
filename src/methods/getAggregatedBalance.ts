@@ -1,61 +1,40 @@
-import { Contract, JsonRpcProvider, formatUnits } from "ethers";
-import { ChainConfig } from "../types";
-import { getProvider } from "../utils/providers";
-import {defaultChains} from '../config/chains'
-
-const ERC20_ABI = [
-  "function balanceOf(address owner) view returns (uint256)",
-  "function decimals() view returns (uint8)",
-  "function name() view returns (string)"
-];
+import { formatUnits } from 'viem';
+import { getBalance } from './getBalance'; // uses bigint balance
+import { defaultChains } from '../config/chains';
 
 export async function getAggregatedBalance(
-  address: string,
-  tokenAddress?: string | undefined,
+  address: `0x${string}`,
+  tokenAddress?: `0x${string}`
 ): Promise<{
-  total: string;
-  breakdown: Record<string, string>;
-  tokenName: string;
+  total: bigint;
+  breakdown: Record<string, string>; // formatted per-chain balance
+  asset: string;
 }> {
-  let total = 0n;
+  let totalRaw = 0n;
   const breakdown: Record<string, string> = {};
-  let tokenName: string = "ETH"; // Default for native token
+  let tokenDecimals = 18;
+  let assetName = tokenAddress ? '' : 'ETH';
 
   for (const chain of defaultChains) {
     try {
-      const provider: JsonRpcProvider = getProvider(chain.rpcUrl);
-      if (!tokenAddress) {
-        // Native token (e.g. ETH, MATIC, etc.)
-        const balance = await provider.getBalance(address);
-        total += balance;
-        breakdown[chain.name] = formatUnits(balance, 18);
-      } else {
-        const token = new Contract(tokenAddress, ERC20_ABI, provider);
-        const balance: bigint = await token.balanceOf(address);
-        const decimals: number = await token.decimals();
+      const result = await getBalance(address, chain, tokenAddress);
 
-        // Only fetch name once
-        if (tokenName === "ETH") {
-          try {
-            tokenName = await token.name();
-          } catch (nameErr) {
-            console.warn(`Could not fetch token name on ${chain.name}`, nameErr);
-            tokenName = "Unknown Token";
-          }
-        }
+      if (!assetName) assetName = result.asset;
 
-        total += balance;
-        breakdown[chain.name] = formatUnits(balance, decimals);
-      }
+      totalRaw += result.balance;
+
+      // Still show formatted value per chain
+      const formatted = formatUnits(result.balance, tokenDecimals);
+      breakdown[chain.name] = formatted;
     } catch (err) {
-      breakdown[chain.name] = "Error";
-      console.warn(`Error fetching from ${chain.name}:`, err);
+      console.warn(`Error fetching balance on ${chain.name}:`, err);
+      breakdown[chain.name] = 'Error';
     }
   }
 
   return {
-    total: formatUnits(total, 18),
+    total: totalRaw, // returning as raw bigint
     breakdown,
-    tokenName
+    asset: assetName,
   };
 }

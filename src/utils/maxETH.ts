@@ -6,16 +6,8 @@ import {
 
  } from "viem";
 
-export async function sendMaxEth(to: Address, chain: any): Promise<bigint> {
-        if (typeof window === 'undefined' || !window.ethereum) {
-            throw new Error('window.ethereum is not available.');
-        }
-
-        // Create wallet client (for signing & sending)
-        const walletClient = createWalletClient({
-            chain: chain,
-            transport: custom(window.ethereum),
-        });
+export async function sendMaxEth(from: Address, to: Address, chain: any): Promise<bigint> {
+       
 
         // Create public client (for reading chain data)
         const publicClient = createPublicClient({
@@ -23,14 +15,14 @@ export async function sendMaxEth(to: Address, chain: any): Promise<bigint> {
             transport: custom(window.ethereum),
         });
 
-        const [account] = await walletClient.getAddresses();
+     
 
         // Step 1: Get full balance
-        const balance = await publicClient.getBalance({ address: account });
+        const balance = await publicClient.getBalance({ address: from });
 
         // Step 2: Estimate gas for sending ETH
         const gasEstimate = await publicClient.estimateGas({
-            account,
+            account: from,
             to,
             value: balance,
         });

@@ -1,9 +1,3 @@
-export interface ChainConfig {
-    name: string;
-    rpcUrl: string;
-    chainId: number;
-    blockexplorer: string;
-}
 export interface SDKOptions {
     chains?: ChainConfig[];
 }
