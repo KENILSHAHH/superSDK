@@ -17,7 +17,10 @@ export async function sendETH(
     amount: bigint,
     tokenAddress: string | undefined,
     chainId: number
-) {
+): Promise<string | undefined> {
+    if (!to) {
+        throw new Error('Recipient address is required');
+    }
     const from = await getConnectedWallet();
     
     if (!from) {
@@ -58,12 +61,14 @@ export async function sendETH(
                     required = required - value;
                     const txLink = `${chain.blockExplorers?.default.url}/tx/${hash}`
                     console.log(txLink);
+                    return txLink;
                 }
                 else {
                     const value = await sendMaxEth(from, to, chain);
                     const txLink = await bridgeETH(value, to, chain, defaultChainId);
                     required = required - value;
                     console.log(txLink);
+                    return txLink;
                 }
             }
             else { 
@@ -74,7 +79,7 @@ export async function sendETH(
     }
 }
 
-    // Usage example
+
 
      
 

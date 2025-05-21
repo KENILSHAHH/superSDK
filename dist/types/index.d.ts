@@ -1,5 +1,6 @@
+import { Chain } from "viem";
 export interface SDKOptions {
-    chains?: ChainConfig[];
+    chains?: Chain[];
 }
 export interface EthereumProvider {
     isMetaMask?: boolean;

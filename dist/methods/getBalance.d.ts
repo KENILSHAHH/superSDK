@@ -1,3 +1,9 @@
-import { GetBalanceParams } from "../types/getBalanceParams";
-export declare function getBalance({ address, chain, tokenAddress, }: GetBalanceParams): Promise<bigint>;
+import { Address, Chain } from 'viem';
+type BalanceResult = {
+    asset: string;
+    chain: string;
+    balance: bigint;
+};
+export declare function getBalance(address: Address, chain: Chain, tokenAddress?: Address | undefined): Promise<BalanceResult>;
+export {};
 //# sourceMappingURL=getBalance.d.ts.map

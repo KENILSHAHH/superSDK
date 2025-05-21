@@ -1,5 +1,5 @@
 import { formatUnits } from 'viem';
-import { getBalance } from './getBalance'; // uses bigint balance
+import  {getBalance}  from './getBalance'; // uses bigint balance
 import { defaultChains } from '../config/chains';
 
 export async function getAggregatedBalance(

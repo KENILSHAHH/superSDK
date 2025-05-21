@@ -1,6 +1,6 @@
 import { createPublicClient, http, Address, Chain } from 'viem';
 import { erc20Abi } from 'viem';
-import { GetBalanceParams } from '../types/getBalanceParams';
+
 
 type BalanceResult = {
   asset: string;

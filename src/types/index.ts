@@ -1,7 +1,7 @@
 
-
+import { Chain } from "viem";
 export interface SDKOptions {
-  chains?: ChainConfig[];
+  chains?: Chain[];
 }
 
 

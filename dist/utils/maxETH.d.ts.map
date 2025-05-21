@@ -1,1 +1,1 @@
-{"version":3,"file":"maxETH.d.ts","sourceRoot":"","sources":["../../src/utils/maxETH.ts"],"names":[],"mappings":"AAAA,OAAO,EAGH,OAAO,EAGT,MAAM,MAAM,CAAC;AAEf,wBAAsB,UAAU,CAAC,EAAE,EAAE,OAAO,EAAE,KAAK,EAAE,GAAG,GAAG,OAAO,CAAC,MAAM,CAAC,CAyCrE"}
+{"version":3,"file":"maxETH.d.ts","sourceRoot":"","sources":["../../src/utils/maxETH.ts"],"names":[],"mappings":"AAAA,OAAO,EAGH,OAAO,EAGT,MAAM,MAAM,CAAC;AAEf,wBAAsB,UAAU,CAAC,IAAI,EAAE,OAAO,EAAE,EAAE,EAAE,OAAO,EAAE,KAAK,EAAE,GAAG,GAAG,OAAO,CAAC,MAAM,CAAC,CAiCpF"}

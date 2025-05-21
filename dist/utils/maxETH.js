@@ -2,26 +2,17 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.sendMaxEth = sendMaxEth;
 const viem_1 = require("viem");
-async function sendMaxEth(to, chain) {
-    if (typeof window === 'undefined' || !window.ethereum) {
-        throw new Error('window.ethereum is not available.');
-    }
-    // Create wallet client (for signing & sending)
-    const walletClient = (0, viem_1.createWalletClient)({
-        chain: chain,
-        transport: (0, viem_1.custom)(window.ethereum),
-    });
+async function sendMaxEth(from, to, chain) {
     // Create public client (for reading chain data)
     const publicClient = (0, viem_1.createPublicClient)({
         chain: chain,
         transport: (0, viem_1.custom)(window.ethereum),
     });
-    const [account] = await walletClient.getAddresses();
     // Step 1: Get full balance
-    const balance = await publicClient.getBalance({ address: account });
+    const balance = await publicClient.getBalance({ address: from });
     // Step 2: Estimate gas for sending ETH
     const gasEstimate = await publicClient.estimateGas({
-        account,
+        account: from,
         to,
         value: balance,
     });
