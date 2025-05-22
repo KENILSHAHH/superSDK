@@ -5,7 +5,7 @@ import { defineChain } from 'viem'
 
  const supersim0 = defineChain({
   id: 901,
-  name: 'Local 901',
+  name: 'supersim0',
   rpcUrls: {
     default: {
       http: ['http://127.0.0.1:9545'],
@@ -33,7 +33,7 @@ import { defineChain } from 'viem'
 
  const supersim1 = defineChain({
   id: 902,
-  name: 'supersim0',
+  name: 'supersim1',
   rpcUrls: {
     default: {
       http: ['http://127.0.0.1:9546'],
