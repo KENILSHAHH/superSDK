@@ -18,13 +18,12 @@ export async function sendETH(
     tokenAddress: string | undefined,
     chainId: number
 ): Promise<string | undefined> {
-    if (!to) {
-        throw new Error('Recipient address is required');
-    }
+    if (typeof window === 'undefined' || !window.ethereum) {
+        throw new Error('No Ethereum provider found')
+      }
     const from = await getConnectedWallet();
-    
     if (!from) {
-        throw new Error('Wallet not connected');
+        throw new Error("No connected wallet");
     }
     const availableETH = await getAggregatedBalance(from);
     console.log(availableETH);
@@ -37,14 +36,15 @@ export async function sendETH(
     if (chainId != defaultChainId) {
         defaultChainId = chainId;
     }
-    const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
-   
+    const currentChainHex = await window.ethereum.request({ method: 'eth_chainId' });
+    console.log(currentChainHex);
+    const currentChainId = parseInt(currentChainHex as string, 16)
     for (const chain of defaultChains) {
         const walletClient = createWalletClient({
             chain: chain,
-            transport: window.ethereum,
+            transport: custom(window.ethereum),
         });
-        if (parseInt(currentChainId, 16) !== chain.id) {
+        if (currentChainId !== chain.id) {
             console.log(`Switching to ${chain.name}...`);
             await switchChains(chain, walletClient);
             const balance = await getBalance(from, chain);
