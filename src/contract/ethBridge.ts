@@ -1,6 +1,6 @@
 import { contracts } from "@eth-optimism/viem";
 import { Address, ChainConfig,createPublicClient, createWalletClient, custom, Chain, parseEther } from "viem";
-import  abi  from "../../abi/superchainERC20.json";
+import  abi  from "../../abi/superchainWETH.json";
 
 
 export async function bridgeETH(
