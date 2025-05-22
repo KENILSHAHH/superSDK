@@ -8,7 +8,7 @@ export class superSDK {
   constructor(options?: SDKOptions) {
     this.chains = options?.chains || defaultChains;
   }
-
+     
   /**
    * Get the balance of either a native token (if no tokenAddress provided)
    * or an ERC-20 token (if tokenAddress is provided), across all configured chains.
@@ -37,7 +37,6 @@ export class superSDK {
   ): Promise<string | undefined> {
     const tx = await sendETH(to, amount, tokenAddress, chainId);
     return tx;
-
   }
     
 
