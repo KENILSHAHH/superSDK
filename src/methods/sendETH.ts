@@ -30,7 +30,7 @@ export async function sendETH(
     console.log(availableETH);
     let required = amount;
     let available = availableETH.total;
-    if (required - available > 0.00002) {
+    if (available - required > 0.00002) {
         throw new Error("Insufficient balance");
     }
     let defaultChainId = defaultChains[0].id;

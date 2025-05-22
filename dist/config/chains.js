@@ -4,7 +4,7 @@ exports.defaultChains = void 0;
 const viem_1 = require("viem");
 const supersim0 = (0, viem_1.defineChain)({
     id: 901,
-    name: 'Local 901',
+    name: 'supersim0',
     rpcUrls: {
         default: {
             http: ['http://127.0.0.1:9545'],
@@ -31,7 +31,7 @@ const supersim0 = (0, viem_1.defineChain)({
 });
 const supersim1 = (0, viem_1.defineChain)({
     id: 902,
-    name: 'supersim0',
+    name: 'supersim1',
     rpcUrls: {
         default: {
             http: ['http://127.0.0.1:9546'],
