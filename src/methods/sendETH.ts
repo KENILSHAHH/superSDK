@@ -2,6 +2,7 @@ import {
     createWalletClient,
     custom,
     Address,
+    createPublicClient
 } from 'viem'
 import { getConnectedWallet } from '../utils/getConnectedWallet'
 import { switchChains } from '../utils/changeChains'
@@ -11,6 +12,7 @@ import { bigintToNumber, numberToBigint } from '../utils/typeConversions'
 import { defaultChains } from "../config/chains";
 import { bridgeETH } from '../contract/ethBridge'
 import { getBalance } from './getBalance'
+import { bridgeMaxETH } from '../utils/bridgeMaxEth'
 
 export async function sendETH(
     to: Address,
@@ -40,7 +42,14 @@ export async function sendETH(
     console.log(currentChainHex);
     const currentChainId = parseInt(currentChainHex as string, 16)
     for (const chain of defaultChains) {
+        if (required <= 0) {
+            break;
+        }
         const walletClient = createWalletClient({
+            chain: chain,
+            transport: custom(window.ethereum),
+        });
+        const publicClient = createPublicClient({
             chain: chain,
             transport: custom(window.ethereum),
         });
@@ -48,14 +57,14 @@ export async function sendETH(
             console.log(`Switching to ${chain.name}...`);
             await switchChains(chain, walletClient);
             const balance = await getBalance(from, chain);
-            if (balance.balance >= 0.0001) {
+            if (balance.balance >= 0.000001) {
                 if (chain.id == defaultChainId) {
-                    const value = await sendMaxEth(from, to, chain)
+                    const value = await sendMaxEth(publicClient, from, to)
                     console.log(value);
                     const hash = await walletClient.sendTransaction({
                         account: from,
                         to: to,
-                        value: value,
+                        value: required <= value ? required : value,
                         chain: walletClient.chain
                     });
                     required = required - value;
@@ -64,8 +73,8 @@ export async function sendETH(
                     return txLink;
                 }
                 else {
-                    const value = await sendMaxEth(from, to, chain);
-                    const txLink = await bridgeETH(value, to, chain, defaultChainId);
+                    const value = await bridgeMaxETH(publicClient, from, to, required , defaultChainId)
+                    const txLink = await bridgeETH(required <= value? required : value, to, publicClient, walletClient, defaultChainId);
                     required = required - value;
                     console.log(txLink);
                     return txLink;

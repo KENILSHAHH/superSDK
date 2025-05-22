@@ -1,25 +1,16 @@
 import { contracts } from "@eth-optimism/viem";
-import { Address, ChainConfig,createPublicClient, createWalletClient, custom, Chain, parseEther } from "viem";
+import { Address, ChainConfig,createPublicClient, createWalletClient, custom, Chain,WalletClient, parseEther, PublicClient } from "viem";
 import  abi  from "../../abi/superchainWETH.json";
 
 
 export async function bridgeETH(
     amount: bigint,
     to: Address,
-    fromChain: Chain,
+    publicClient: PublicClient,
+walletClient: WalletClient,
     toChain: Number,
 ) {
-    const publicClient = createPublicClient({
-        chain: fromChain,
-        transport: custom(window.ethereum)
-    });
-    console.log("publicClient", publicClient);
-    const client = createWalletClient({
-        chain: fromChain,
-        transport: custom(window.ethereum)
-    });
-    console.log("client", client);
-    const [account] = await client.getAddresses();
+    const [account] = await walletClient.getAddresses();
     const { request } = await publicClient.simulateContract({
         address: contracts.superchainETHBridge.address,
         abi: abi,
@@ -28,6 +19,6 @@ export async function bridgeETH(
         account: account,
         value: amount,
     });
-    const tx = await client.writeContract(request);
-    return `${fromChain.blockExplorers?.default.url}/tx/${tx}`
+    const tx = await walletClient.writeContract(request);
+    return `${walletClient.chain?.blockExplorers?.default.url}/tx/${tx}`
 }
