@@ -17,7 +17,6 @@ import { bridgeMaxETH } from '../utils/bridgeMaxEth'
 export async function sendETH(
     to: Address,
     amount: bigint,
-    tokenAddress: string | undefined,
     chainId: number
 ): Promise<string | undefined> {
     if (typeof window === 'undefined' || !window.ethereum) {

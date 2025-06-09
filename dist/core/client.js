@@ -8,10 +8,6 @@ class superSDK {
     constructor(options) {
         this.chains = options?.chains || chains_1.defaultChains;
     }
-    /**
-     * Get the balance of either a native token (if no tokenAddress provided)
-     * or an ERC-20 token (if tokenAddress is provided), across all configured chains.
-     */
     async getBalance(address, tokenAddress) {
         if (!address) {
             throw new Error("Address is required");
@@ -25,7 +21,7 @@ class superSDK {
         return (0, getAggregatedBalance_1.getAggregatedBalance)(address, tokenAddress);
     }
     async sendETH(to, amount, tokenAddress, chainId) {
-        const tx = await (0, sendETH_1.sendETH)(to, amount, tokenAddress, chainId);
+        const tx = await (0, sendETH_1.sendETH)(to, amount, chainId);
         return tx;
     }
 }

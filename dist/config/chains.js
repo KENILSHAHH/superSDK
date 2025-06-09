@@ -1,6 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.defaultChains = void 0;
+const chains_1 = require("@eth-optimism/viem/src/chains");
 const viem_1 = require("viem");
 const supersim0 = (0, viem_1.defineChain)({
     id: 901,
@@ -53,6 +54,6 @@ const supersim1 = (0, viem_1.defineChain)({
     contracts: {},
 });
 exports.defaultChains = [
-    supersim0, supersim1
+    chains_1.interopAlpha0, chains_1.interopAlpha1
 ];
 //# sourceMappingURL=chains.js.map
