@@ -10,9 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@eth-optimism/viem": "^0.4.8",
-    "@zerodev/multi-chain-ecdsa-validator": "^5.4.5",
-    "@zerodev/sdk": "^5.4.35",
+    "@eth-optimism/viem": "^0.4.9",
     "dotenv": "^16.5.0",
     "ethers": "^6.13.7"
   },
