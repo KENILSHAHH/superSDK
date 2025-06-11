@@ -1,5 +1,5 @@
 
-import { interopAlpha0, interopAlpha1 } from "@eth-optimism/viem/src/chains";
+import { interopAlpha0, interopAlpha1 } from "@eth-optimism/viem/src/chains/interopAlpha";
 import { Chain } from "viem";
 import { defineChain } from 'viem'
 
