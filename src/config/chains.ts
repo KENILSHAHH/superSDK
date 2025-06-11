@@ -1,5 +1,5 @@
 
-import { interopAlpha0, interopAlpha1} from "@eth-optimism/viem/";
+import { interopAlpha0, interopAlpha1} from "@eth-optimism/viem/src/chains";
 import { Chain } from "viem";
 
 export const defaultChains: Chain[] = [
