@@ -15,7 +15,7 @@ export async function getBalance(
 ): Promise<BalanceResult> {
   const client = createPublicClient({
     chain,
-    transport: http(window.ethereum),
+    transport: http(),
   });
 
   if (!tokenAddress) {
