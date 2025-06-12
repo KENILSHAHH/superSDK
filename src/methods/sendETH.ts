@@ -53,7 +53,7 @@ export async function sendETH(
             chain: chain,
             transport: custom(window.ethereum),
         });
-        if (currentChainId !== chain.id) {
+        if (currentChainId != chain.id) {
             console.log(`Switching to ${chain.name}...`);
             await switchChains(chain, walletClient);
             const balance = await getBalance(from, chain);
