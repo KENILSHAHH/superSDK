@@ -6,7 +6,7 @@ const viem_2 = require("viem");
 async function getBalance(address, chain, tokenAddress) {
     const client = (0, viem_1.createPublicClient)({
         chain,
-        transport: (0, viem_1.http)(window.ethereum),
+        transport: (0, viem_1.http)(),
     });
     if (!tokenAddress) {
         // Native ETH balance
