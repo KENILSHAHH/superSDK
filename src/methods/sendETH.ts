@@ -40,6 +40,7 @@ export async function sendETH(
     const currentChainHex = await window.ethereum.request({ method: 'eth_chainId' });
     console.log(currentChainHex);
     const currentChainId = parseInt(currentChainHex as string, 16)
+    console.log(`Current chain ID: ${currentChainId}`);
     for (const chain of defaultChains) {
         if (required <= 0) {
             break;
