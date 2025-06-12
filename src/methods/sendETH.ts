@@ -43,6 +43,7 @@ export async function sendETH(
     console.log(`Current chain ID: ${currentChainId}`);
     for (const chain of defaultChains) {
         if (required <= 0) {
+            console.log("hey bitch");
             break;
         }
         const walletClient = createWalletClient({
@@ -54,6 +55,8 @@ export async function sendETH(
             transport: custom(window.ethereum),
         });
         if (currentChainId != chain.id) {
+            console.log("current chain id: ", currentChainId);
+            console.log("chain id: ", chain.id);
             console.log(`Switching to ${chain.name}...`);
             await switchChains(chain, walletClient);
             const balance = await getBalance(from, chain);
