@@ -60,7 +60,7 @@ export async function sendETH(
             console.log(`Switching to ${chain.name}...`);
             await switchChains(chain, walletClient);
             const balance = await getBalance(from, chain);
-            if (balance.balance >= 0.000001) {
+            if (balance.balance >= 0.1) {
                 if (chain.id == defaultChainId) {
                     const value = await sendMaxEth(publicClient, from, to)
                     console.log(value);
