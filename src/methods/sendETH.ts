@@ -108,15 +108,12 @@ export async function sendETH(
                     required = required - value;
                     const txLink = `${chain.blockExplorers?.default.url}/tx/${hash}`
                     console.log(txLink);
-                    return txLink;
                 }
                 else {
                     console.log("Bridging ETH to default chain");
                     const value = await bridgeMaxETH(publicClient, from, to, required , defaultChainId)
                     const txLink = await bridgeETH(required <= value? required : value, to, publicClient, walletClient, defaultChainId);
                     required = required - value;
-                    console.log(txLink);
-                    return txLink;
                 }
             }
             else { 
