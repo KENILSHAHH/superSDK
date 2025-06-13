@@ -46,6 +46,7 @@ export async function sendETH(
     if (!defaultChain) {
         throw new Error(`Chain with id ${defaultChainId} not found in defaultChains`);
     }
+    
 
     const defaultWalletClient = createWalletClient({
       chain: defaultChain,
@@ -57,9 +58,11 @@ export async function sendETH(
     });
     
     const defaultBalance = await getBalance(from, defaultChain);
-    
+    console.log("Default chain balance:", defaultBalance);
     // If sufficient balance on default chain, send and exit
     if (defaultBalance.balance >= required) {
+        console.log('error here')
+    await switchChains(defaultChain, defaultWalletClient);
       const value = await sendMaxEth(defaultPublicClient, from, to);
       const hash = await defaultWalletClient.sendTransaction({
         account: from,
@@ -67,7 +70,7 @@ export async function sendETH(
         value: required <= value ? required : value,
         chain: defaultChain
       });
-    
+    console.log("error here 2")
       const txLink = `${defaultChain.blockExplorers?.default.url}/tx/${hash}`;
       console.log("Sent from default chain:", txLink);
       return txLink;
