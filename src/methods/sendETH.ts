@@ -4,6 +4,7 @@ import {
     Address,
     createPublicClient
 } from 'viem'
+import { Chain } from 'viem'
 import { getConnectedWallet } from '../utils/getConnectedWallet'
 import { switchChains } from '../utils/changeChains'
 import { sendMaxEth } from '../utils/maxETH'
@@ -41,6 +42,36 @@ export async function sendETH(
     console.log(currentChainHex);
     const currentChainId = parseInt(currentChainHex as string, 16)
     console.log(`Current chain ID: ${currentChainId}`);
+    const defaultChain = defaultChains.find(c => c.id === defaultChainId);
+    if (!defaultChain) {
+        throw new Error(`Chain with id ${defaultChainId} not found in defaultChains`);
+    }
+
+    const defaultWalletClient = createWalletClient({
+      chain: defaultChain,
+      transport: custom(window.ethereum),
+    });
+    const defaultPublicClient = createPublicClient({
+      chain: defaultChain,
+      transport: custom(window.ethereum),
+    });
+    
+    const defaultBalance = await getBalance(from, defaultChain);
+    
+    // If sufficient balance on default chain, send and exit
+    if (defaultBalance.balance >= required) {
+      const value = await sendMaxEth(defaultPublicClient, from, to);
+      const hash = await defaultWalletClient.sendTransaction({
+        account: from,
+        to,
+        value: required <= value ? required : value,
+        chain: defaultChain
+      });
+    
+      const txLink = `${defaultChain.blockExplorers?.default.url}/tx/${hash}`;
+      console.log("Sent from default chain:", txLink);
+      return txLink;
+    }
     for (const chain of defaultChains) {
         if (required <= 0) {
             console.log("hey bitch");
