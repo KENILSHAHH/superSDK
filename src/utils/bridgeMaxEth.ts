@@ -16,12 +16,14 @@ export async function bridgeMaxETH(publicClient: PublicClient,  from: Address, t
  
         // Step 1: Get full balance
         const balance = await publicClient.getBalance({ address: from });
-        // Step 2: Estimate gas for sending ETH
+    // Step 2: Estimate gas for sending ETH
+    console.log(balance)
         const data: Hex = encodeFunctionData({
             abi: abi,
             functionName: 'sendETH',
             args: [to, toChain],
-          })
+        })
+    console.log(data)
 
         // Step 3: Get gas price
         const gasPrice = await publicClient.getGasPrice();
@@ -31,6 +33,7 @@ export async function bridgeMaxETH(publicClient: PublicClient,  from: Address, t
             data,
             value: value,
         });
+    console.log(gasEstimate)
         // Step 4: Calculate transferable amount
         const gasCost = gasEstimate * gasPrice;
         const maxTransferable = balance - gasCost;
