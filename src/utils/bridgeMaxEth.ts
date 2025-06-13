@@ -17,9 +17,7 @@ export async function bridgeMaxETH(publicClient: PublicClient, from: Address, to
     const balance = await publicClient.getBalance({ address: from });
     console.log("Wallet balance:", balance);
 
-    if (value > balance) {
-        throw new Error("Requested value exceeds wallet balance");
-    }
+
 
     const encodedData: Hex = encodeFunctionData({
         abi,
@@ -37,7 +35,7 @@ export async function bridgeMaxETH(publicClient: PublicClient, from: Address, to
             account: from,
             to: bridgeAddress,
             data: encodedData,
-            value,
+            value : balance,
         });
     } catch (err) {
         console.error("Gas estimation failed. Trying simulation...", err);
@@ -48,7 +46,7 @@ export async function bridgeMaxETH(publicClient: PublicClient, from: Address, to
             functionName: 'sendETH',
             args: [to, BigInt(toChain)],
             account: from,
-            value,
+            value: balance,
         });
 
         if (simulated.request.gas === undefined) {
