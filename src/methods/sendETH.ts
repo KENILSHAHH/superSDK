@@ -95,6 +95,7 @@ export async function sendETH(
             await switchChains(chain, walletClient);
             const balance = await getBalance(from, chain);
             if (balance.balance >= 0.1) {
+                console.log("this is working fine")
                 if (chain.id == defaultChainId) {
                     const value = await sendMaxEth(publicClient, from, to)
                     console.log(value);
@@ -110,6 +111,7 @@ export async function sendETH(
                     return txLink;
                 }
                 else {
+                    console.log("Bridging ETH to default chain");
                     const value = await bridgeMaxETH(publicClient, from, to, required , defaultChainId)
                     const txLink = await bridgeETH(required <= value? required : value, to, publicClient, walletClient, defaultChainId);
                     required = required - value;
