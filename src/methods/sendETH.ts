@@ -115,8 +115,8 @@ export async function sendETH(
                 else {
                     console.log("Requried before bridging: ", required);
                     console.log("Bridging ETH to default chain");
-                    const value = await bridgeMaxETH(publicClient, from, to , defaultChainId)
-                    const txLink = await bridgeETH(required <= value? required : value, to, publicClient, walletClient, defaultChainId);
+                    const value = await bridgeMaxETH(publicClient, from, to , destinationChainId)
+                    const txLink = await bridgeETH(required <= value? required : value, to, publicClient, walletClient, destinationChainId);
                     console.log(required,value)
                     required = required - value;
                     console.log("Required after bridging: ", required);
