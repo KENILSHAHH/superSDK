@@ -80,6 +80,17 @@ export async function sendETH(
             console.log("hey bitch");
             break;
         }
+       
+        if (currentChainId != chain.id) {
+            console.log("current chain id: ", currentChainId);
+            console.log("chain id: ", chain.id);
+            console.log(`Switching to ${chain.name}...`);
+            const walletClient = createWalletClient({
+                chain: chain,
+                transport: custom(window.ethereum),
+            });
+            await switchChains(chain, walletClient);
+        }
         const walletClient = createWalletClient({
             chain: chain,
             transport: custom(window.ethereum),
@@ -88,12 +99,6 @@ export async function sendETH(
             chain: chain,
             transport: custom(window.ethereum),
         });
-        if (currentChainId != chain.id) {
-            console.log("current chain id: ", currentChainId);
-            console.log("chain id: ", chain.id);
-            console.log(`Switching to ${chain.name}...`);
-            await switchChains(chain, walletClient);
-        }
             const balance = await getBalance(from, chain);
             if (balance.balance >= 0.001) {
                 if (chain.id == destinationChainId) {
