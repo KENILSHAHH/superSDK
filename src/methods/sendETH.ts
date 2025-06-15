@@ -98,7 +98,15 @@ export async function sendETH(
             if (balance.balance >= 0.001) {
                 if (chain.id == destinationChainId) {
                     console.log("Required before sending: ", required);
-                    const value = await sendMaxEth(publicClient, from, to)
+                    let value: bigint;
+                    try {
+                      value = await sendMaxEth(publicClient, from, to);
+                    } catch (err) {
+                      if (err instanceof Error) {
+                        console.warn(`Skipping ${chain.name} due to sendMaxEth error:`, err.message);
+                      }
+                      continue;
+                    }
                     console.log(value);
                     const hash = await walletClient.sendTransaction({
                         account: from,
@@ -122,17 +130,6 @@ export async function sendETH(
                     console.log("Required after bridging: ", required);
                 }
             }
-            else { 
-                continue;
-            }
-           
         }
     
 }
-
-
-
-     
-
-
-
