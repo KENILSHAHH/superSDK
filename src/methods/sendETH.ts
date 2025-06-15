@@ -34,44 +34,44 @@ export async function sendETH(
     if (required - available > 0.00002) {
         throw new Error("Insufficient balance");
     }
-    let defaultChainId = defaultChains[0].id;
-    if (chainId != defaultChainId) {
-        defaultChainId = chainId;
+    let destinationChainId = defaultChains[0].id;
+    if (chainId) {
+        destinationChainId = chainId;
     }
     const currentChainHex = await window.ethereum.request({ method: 'eth_chainId' });
     console.log(currentChainHex);
     const currentChainId = parseInt(currentChainHex as string, 16)
     console.log(`Current chain ID: ${currentChainId}`);
-    const defaultChain = defaultChains.find(c => c.id === defaultChainId);
-    if (!defaultChain) {
-        throw new Error(`Chain with id ${defaultChainId} not found in defaultChains`);
+    const destinationChain = defaultChains.find(c => c.id === destinationChainId);
+    if (!destinationChain) {
+        throw new Error(`Chain with id ${destinationChainId} not found in defaultChains`);
     }
     
 
-    const defaultWalletClient = createWalletClient({
-      chain: defaultChain,
+    const destinationWalletClient = createWalletClient({
+      chain: destinationChain,
       transport: custom(window.ethereum),
     });
-    const defaultPublicClient = createPublicClient({
-      chain: defaultChain,
+    const destinationPublicClient = createPublicClient({
+      chain: destinationChain,
       transport: custom(window.ethereum),
     });
     
-    const defaultBalance = await getBalance(from, defaultChain);
+    const defaultBalance = await getBalance(from, destinationChain);
     console.log("Default chain balance:", defaultBalance);
     // If sufficient balance on default chain, send and exit
     if (defaultBalance.balance >= required) {
         console.log('error here')
-    await switchChains(defaultChain, defaultWalletClient);
-      const value = await sendMaxEth(defaultPublicClient, from, to);
-      const hash = await defaultWalletClient.sendTransaction({
+    await switchChains(destinationChain, destinationWalletClient);
+      const value = await sendMaxEth(destinationPublicClient, from, to);
+        const hash = await destinationWalletClient.sendTransaction({
         account: from,
         to,
         value: required <= value ? required : value,
-        chain: defaultChain
+        chain: destinationChain
       });
     console.log("error here 2")
-      const txLink = `${defaultChain.blockExplorers?.default.url}/tx/${hash}`;
+      const txLink = `${destinationChain.blockExplorers?.default.url}/tx/${hash}`;
       console.log("Sent from default chain:", txLink);
       return txLink;
     }
@@ -93,10 +93,11 @@ export async function sendETH(
             console.log("chain id: ", chain.id);
             console.log(`Switching to ${chain.name}...`);
             await switchChains(chain, walletClient);
+        }
             const balance = await getBalance(from, chain);
-            if (balance.balance >= 0.1) {
-                console.log("this is working fine")
-                if (chain.id == defaultChainId) {
+            if (balance.balance >= 0.001) {
+                if (chain.id == destinationChainId) {
+                    console.log("Required before sending: ", required);
                     const value = await sendMaxEth(publicClient, from, to)
                     console.log(value);
                     const hash = await walletClient.sendTransaction({
@@ -106,16 +107,19 @@ export async function sendETH(
                         chain: walletClient.chain
                     });
                     required = required - value;
-                    console.log(required, value);
+                    console.log("value: ", value);
+                    console.log("Required after sending: ", required);
                     const txLink = `${chain.blockExplorers?.default.url}/tx/${hash}`
                     console.log(txLink);
                 }
                 else {
+                    console.log("Requried before bridging: ", required);
                     console.log("Bridging ETH to default chain");
-                    const value = await bridgeMaxETH(publicClient, from, to, required , defaultChainId)
+                    const value = await bridgeMaxETH(publicClient, from, to , defaultChainId)
                     const txLink = await bridgeETH(required <= value? required : value, to, publicClient, walletClient, defaultChainId);
+                    console.log(required,value)
                     required = required - value;
-                    console.log(required, value)
+                    console.log("Required after bridging: ", required);
                 }
             }
             else { 
@@ -123,7 +127,7 @@ export async function sendETH(
             }
            
         }
-    }
+    
 }
 
 
