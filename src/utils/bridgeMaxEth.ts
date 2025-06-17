@@ -8,7 +8,7 @@ import {
     encodeFunctionData
 } from "viem";
 import abi from "../../abi/superchainWETH.json";
-import { addresses } from "../config/addresses";
+
  import { contracts } from "@eth-optimism/viem";
 
 export async function bridgeMaxETH(publicClient: PublicClient, from: Address, to: Address, toChain: number): Promise<bigint> {

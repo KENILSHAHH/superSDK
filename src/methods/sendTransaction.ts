@@ -9,6 +9,8 @@ import { switchChains } from '../utils/changeChains';
 
 export async function sendTransaction({
     contractAddress,
+    tokenAddress,
+    amount,
     chainId,
     userAddress,
     functionName,
@@ -19,7 +21,16 @@ export async function sendTransaction({
   if (typeof window === 'undefined' || !window.ethereum) {
     throw new Error('No Ethereum provider found');
   }
-
+    if (tokenAddress && amount && amount > 0n) {
+        const balance = await getAggregatedBalance(userAddress, tokenAddress);
+        if (balance.total < amount) {
+            throw new Error("Insufficient balance for the specified token");
+        }
+        else {
+            
+        }
+    }
+  
   const destinationChain = defaultChains.find(c => c.id === chainId);
   if (!destinationChain) {
     throw new Error(`Chain with id ${chainId} not found`);
@@ -38,8 +49,6 @@ export async function sendTransaction({
     transport: custom(window.ethereum),
   });
   
- 
-    
   const simulation = await publicClient.simulateContract({
     address: contractAddress,
     abi,

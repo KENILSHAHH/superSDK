@@ -1,35 +1,28 @@
 import { contracts } from "@eth-optimism/viem";
-import { Address, ChainConfig,createPublicClient, createWalletClient, custom, Chain, parseEther } from "viem";
+import { Address, ChainConfig,createPublicClient, createWalletClient, custom, Chain, parseEther, PublicClient, WalletClient } from "viem";
 import  abi  from "../../abi/superchainERC20.json";
+
 
 
 export async function bridgeERC20(
     tokenAddress: Address,
-    amount:string,
+    amount:bigint,
     to: Address,
-    fromChain: Chain,
-    toChain: BigInt,
+    publicClient: PublicClient,
+    walletClient: WalletClient,
+    toChain: Number,
 ) {
-    const publicClient = createPublicClient({
-        chain: fromChain,
-        transport: custom(window.ethereum)
-    });
-    console.log("publicClient", publicClient);
-    const client = createWalletClient({
-        chain: fromChain,
-        transport: custom(window.ethereum)
-    });
-    console.log("client", client);
-    const [account] = await client.getAddresses();
-    const amountInBigint = parseEther(amount);
+
+    const [account] = await walletClient.getAddresses();
+    
     const { request } = await publicClient.simulateContract({
         address: contracts.superchainTokenBridge.address,
         abi: abi,
         functionName: "sendERC20",
-        args: [tokenAddress, to, amountInBigint, toChain],
+        args: [tokenAddress, to, amount, toChain],
         account: account,
     });
 
-    const tx = await client.writeContract(request);
-    return `${fromChain.blockExplorers?.default.url}/tx/${tx}`
+    const tx = await walletClient.writeContract(request);
+    return `${walletClient.chain?.blockExplorers?.default.url}/tx/${tx}`
 }

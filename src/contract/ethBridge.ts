@@ -1,13 +1,12 @@
 import { contracts } from "@eth-optimism/viem";
-import { Address, ChainConfig,createPublicClient, createWalletClient, custom, Chain,WalletClient, parseEther, PublicClient } from "viem";
-import  abi  from "../../abi/superchainWETH.json";
-
+import { Address, WalletClient, PublicClient } from "viem";
+import abi from "../../abi/superchainWETH.json";
 
 export async function bridgeETH(
     amount: bigint,
     to: Address,
     publicClient: PublicClient,
-walletClient: WalletClient,
+    walletClient: WalletClient,
     toChain: Number,
 ) {
     const [account] = await walletClient.getAddresses();

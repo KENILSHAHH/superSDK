@@ -4,20 +4,18 @@ import {
     Address,
     createPublicClient
 } from 'viem'
-import { Chain } from 'viem'
 import { getConnectedWallet } from '../utils/getConnectedWallet'
 import { switchChains } from '../utils/changeChains'
-import { sendMaxEth } from '../utils/maxETH'
 import {getAggregatedBalance} from './getAggregatedBalance'
-import { bigintToNumber, numberToBigint } from '../utils/typeConversions'
 import { defaultChains } from "../config/chains";
-import { bridgeETH } from '../contract/ethBridge'
+import { bridgeERC20 } from '../contract/erc20Bridge'
 import { getBalance } from './getBalance'
-import { bridgeMaxETH } from '../utils/bridgeMaxEth'
 
-export async function sendETH(
+
+export async function sendERC20(
     to: Address,
     amount: bigint,
+    tokenAddress : Address,
     chainId: number
 ): Promise<string | undefined> {
     if (typeof window === 'undefined' || !window.ethereum) {
@@ -27,11 +25,11 @@ export async function sendETH(
     if (!from) {
         throw new Error("No connected wallet");
     }
-    const availableETH = await getAggregatedBalance(from);
-    console.log(availableETH);
+    const availableBalance = await getAggregatedBalance(from, tokenAddress);
+    console.log(availableBalance);
     let required = amount;
-    let available = availableETH.total;
-    if (required - available > 0.00002) {
+    let available = availableBalance.total;
+    if (required  > available) {
         throw new Error("Insufficient balance");
     }
     let destinationChainId = defaultChains[0].id;
@@ -55,17 +53,17 @@ export async function sendETH(
       transport: custom(window.ethereum),
     });
     
-    const defaultBalance = await getBalance(from, destinationChain);
+    const defaultBalance = await getBalance(from, destinationChain, tokenAddress);
     console.log("Default chain balance:", defaultBalance);
     // If sufficient balance on default chain, send and exit
     if (defaultBalance.balance >= required) {
         console.log('error here')
     await switchChains(destinationChain, destinationWalletClient);
-      const value = await sendMaxEth(destinationPublicClient, from, to);
+
         const hash = await destinationWalletClient.sendTransaction({
         account: from,
         to,
-        value: required <= value ? required : value,
+        value: required <= defaultBalance.balance ? required : defaultBalance.balance,
         chain: destinationChain
       });
     console.log("error here 2")
@@ -98,19 +96,10 @@ export async function sendETH(
             transport: custom(window.ethereum),
         });
             const balance = await getBalance(from, chain);
-            if (balance.balance >= 0.001) {
+            if (balance.balance > 0) {
                 if (chain.id == destinationChainId) {
                     console.log("Required before sending: ", required);
-                    let value: bigint;
-                    try {
-                      value = await sendMaxEth(publicClient, from, to);
-                    } catch (err) {
-                      if (err instanceof Error) {
-                        console.warn(`Skipping ${chain.name} due to sendMaxEth error:`, err.message);
-                      }
-                      continue;
-                    }
-                    console.log(value);
+                    let value: bigint = balance.balance;
                     const hash = await walletClient.sendTransaction({
                         account: from,
                         to: to,
@@ -126,8 +115,8 @@ export async function sendETH(
                 else {
                     console.log("Requried before bridging: ", required);
                     console.log("Bridging ETH to default chain");
-                    const value = await bridgeMaxETH(publicClient, from, to , destinationChainId)
-                    const txLink = await bridgeETH(required <= value? required : value, to, publicClient, walletClient, destinationChainId);
+                    let value: bigint = balance.balance;
+                    const txLink = await bridgeERC20(tokenAddress, required <= value? required : value, to, publicClient, walletClient, destinationChainId);
                     console.log(required,value)
                     required = required - value;
                     console.log("Required after bridging: ", required);

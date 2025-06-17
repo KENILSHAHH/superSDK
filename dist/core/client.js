@@ -26,7 +26,7 @@ class superSDK {
         return tx;
     }
     async sendTransaction(contractAddress, chainId, userAddress, functionName, functionParams, abi, value) {
-        await (0, sendTransaction_1.sendTransaction)({
+        return await (0, sendTransaction_1.sendTransaction)({
             contractAddress,
             chainId,
             userAddress,
@@ -35,7 +35,6 @@ class superSDK {
             abi,
             value: value ?? 0n,
         });
-        throw new Error("Method not implemented.");
     }
 }
 exports.superSDK = superSDK;

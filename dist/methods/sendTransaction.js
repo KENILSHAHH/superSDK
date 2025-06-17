@@ -5,6 +5,7 @@ const viem_1 = require("viem");
 const chains_1 = require("../config/chains");
 const getAggregatedBalance_1 = require("./getAggregatedBalance");
 const sendETH_1 = require("./sendETH");
+const changeChains_1 = require("../utils/changeChains");
 async function sendTransaction({ contractAddress, chainId, userAddress, functionName, functionParams, abi, value }) {
     if (typeof window === 'undefined' || !window.ethereum) {
         throw new Error('No Ethereum provider found');
@@ -12,6 +13,15 @@ async function sendTransaction({ contractAddress, chainId, userAddress, function
     const destinationChain = chains_1.defaultChains.find(c => c.id === chainId);
     if (!destinationChain) {
         throw new Error(`Chain with id ${chainId} not found`);
+    }
+    const currentChainHex = await window.ethereum.request({ method: 'eth_chainId' });
+    const currentChainId = parseInt(currentChainHex, 16);
+    const switchWalletClient = (0, viem_1.createWalletClient)({
+        chain: destinationChain,
+        transport: (0, viem_1.custom)(window.ethereum),
+    });
+    if (currentChainId !== chainId) {
+        await (0, changeChains_1.switchChains)(destinationChain, switchWalletClient);
     }
     const publicClient = (0, viem_1.createPublicClient)({
         chain: destinationChain,
