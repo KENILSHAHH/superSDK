@@ -46,7 +46,7 @@ export class superSDK {
     abi: any,
     value?: bigint
   ): Promise<string> {
-    await sendTransaction({
+   return await sendTransaction({
       contractAddress,
       chainId,
       userAddress,
@@ -55,9 +55,5 @@ export class superSDK {
       abi,
       value: value ?? 0n,
     });
-    throw new Error("Method not implemented.");
   }
-  
-    
-
 }

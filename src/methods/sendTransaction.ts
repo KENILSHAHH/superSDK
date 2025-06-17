@@ -3,6 +3,10 @@ import { defaultChains } from "../config/chains";
 import { getAggregatedBalance } from './getAggregatedBalance';
 import { sendETH } from './sendETH';
 import { SendTransactionParams } from '../types/Transaction';
+import { switchChain } from 'viem/_types/actions/wallet/switchChain';
+import { switchChains } from '../utils/changeChains';
+
+
 export async function sendTransaction({
     contractAddress,
     chainId,
@@ -20,12 +24,22 @@ export async function sendTransaction({
   if (!destinationChain) {
     throw new Error(`Chain with id ${chainId} not found`);
   }
-
+  const currentChainHex = await window.ethereum.request({ method: 'eth_chainId' });
+    const currentChainId = parseInt(currentChainHex as string, 16);
+    const switchWalletClient = createWalletClient({
+        chain: destinationChain,
+        transport: custom(window.ethereum),
+      });
+    if (currentChainId !== chainId) {
+        await switchChains(destinationChain, switchWalletClient)
+    }
   const publicClient = createPublicClient({
     chain: destinationChain,
     transport: custom(window.ethereum),
   });
-
+  
+ 
+    
   const simulation = await publicClient.simulateContract({
     address: contractAddress,
     abi,

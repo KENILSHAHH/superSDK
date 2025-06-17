@@ -4,6 +4,7 @@ exports.superSDK = void 0;
 const chains_1 = require("../config/chains");
 const getAggregatedBalance_1 = require("../methods/getAggregatedBalance");
 const sendETH_1 = require("../methods/sendETH");
+const sendTransaction_1 = require("../methods/sendTransaction");
 class superSDK {
     constructor(options) {
         this.chains = options?.chains || chains_1.defaultChains;
@@ -23,6 +24,18 @@ class superSDK {
     async sendETH(to, amount, tokenAddress, chainId) {
         const tx = await (0, sendETH_1.sendETH)(to, amount, chainId);
         return tx;
+    }
+    async sendTransaction(contractAddress, chainId, userAddress, functionName, functionParams, abi, value) {
+        await (0, sendTransaction_1.sendTransaction)({
+            contractAddress,
+            chainId,
+            userAddress,
+            functionName,
+            functionParams,
+            abi,
+            value: value ?? 0n,
+        });
+        throw new Error("Method not implemented.");
     }
 }
 exports.superSDK = superSDK;
