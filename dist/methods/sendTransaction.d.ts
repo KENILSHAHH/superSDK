@@ -1,3 +1,3 @@
-import { Address } from 'viem';
-export declare function sendETH(to: Address, amount: bigint, tokenAddress: string | undefined, chainId: number): Promise<void>;
+import { SendTransactionParams } from '../types/Transaction';
+export declare function sendTransaction({ contractAddress, chainId, userAddress, functionName, functionParams, abi, value }: SendTransactionParams): Promise<string>;
 //# sourceMappingURL=sendTransaction.d.ts.map

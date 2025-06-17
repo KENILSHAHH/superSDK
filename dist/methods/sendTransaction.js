@@ -1,66 +1,46 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sendETH = sendETH;
+exports.sendTransaction = sendTransaction;
 const viem_1 = require("viem");
-const getConnectedWallet_1 = require("../utils/getConnectedWallet");
-const changeChains_1 = require("../utils/changeChains");
-const maxETH_1 = require("../utils/maxETH");
-const getAggregatedBalance_1 = require("./getAggregatedBalance");
 const chains_1 = require("../config/chains");
-const ethBridge_1 = require("../contract/ethBridge");
-const getBalance_1 = require("./getBalance");
-async function sendETH(to, amount, tokenAddress, chainId) {
-    const from = await (0, getConnectedWallet_1.getConnectedWallet)();
-    if (!from) {
-        throw new Error('Wallet not connected');
+const getAggregatedBalance_1 = require("./getAggregatedBalance");
+const sendETH_1 = require("./sendETH");
+async function sendTransaction({ contractAddress, chainId, userAddress, functionName, functionParams, abi, value }) {
+    if (typeof window === 'undefined' || !window.ethereum) {
+        throw new Error('No Ethereum provider found');
     }
-    const availableETH = await (0, getAggregatedBalance_1.getAggregatedBalance)(from);
-    console.log(availableETH);
-    let required = amount;
-    let available = availableETH.total;
-    if (required - available > 0.00002) {
-        throw new Error("Insufficient balance");
+    const destinationChain = chains_1.defaultChains.find(c => c.id === chainId);
+    if (!destinationChain) {
+        throw new Error(`Chain with id ${chainId} not found`);
     }
-    let defaultChainId = chains_1.defaultChains[0].id;
-    if (chainId != defaultChainId) {
-        defaultChainId = chainId;
+    const publicClient = (0, viem_1.createPublicClient)({
+        chain: destinationChain,
+        transport: (0, viem_1.custom)(window.ethereum),
+    });
+    const simulation = await publicClient.simulateContract({
+        address: contractAddress,
+        abi,
+        functionName,
+        args: functionParams,
+        account: userAddress,
+        value: value ?? 0n,
+    });
+    const requiredETH = simulation.request.value ?? 0n;
+    const aggregated = await (0, getAggregatedBalance_1.getAggregatedBalance)(userAddress);
+    if (aggregated.total < requiredETH) {
+        throw new Error("Insufficient aggregated ETH balance");
     }
-    const currentChainId = await window.ethereum.request({ method: 'eth_chainId' });
-    for (const chain of chains_1.defaultChains) {
-        const walletClient = (0, viem_1.createWalletClient)({
-            chain: chain,
-            transport: window.ethereum,
-        });
-        if (parseInt(currentChainId, 16) !== chain.id) {
-            console.log(`Switching to ${chain.name}...`);
-            await (0, changeChains_1.switchChains)(chain, walletClient);
-            const balance = await (0, getBalance_1.getBalance)(from, chain);
-            if (balance.balance >= 0.0001) {
-                if (chain.id == defaultChainId) {
-                    const value = await (0, maxETH_1.sendMaxEth)(from, to, chain);
-                    console.log(value);
-                    const hash = await walletClient.sendTransaction({
-                        account: from,
-                        to: to,
-                        value: value,
-                        chain: walletClient.chain
-                    });
-                    required = required - value;
-                    const txLink = `${chain.blockExplorers?.default.url}/tx/${hash}`;
-                    console.log(txLink);
-                }
-                else {
-                    const value = await (0, maxETH_1.sendMaxEth)(from, to, chain);
-                    const txLink = await (0, ethBridge_1.bridgeETH)(value, to, chain, defaultChainId);
-                    required = required - value;
-                    console.log(txLink);
-                }
-            }
-            else {
-                continue;
-            }
-        }
+    if (requiredETH > 0n) {
+        const bridgetx = await (0, sendETH_1.sendETH)(userAddress, requiredETH, chainId);
     }
+    const walletClient = (0, viem_1.createWalletClient)({
+        chain: destinationChain,
+        transport: (0, viem_1.custom)(window.ethereum),
+    });
+    const txHash = await walletClient.sendTransaction({
+        ...simulation.request,
+        to: contractAddress,
+    });
+    return `${destinationChain.blockExplorers?.default.url}/tx/${txHash}`;
 }
-// Usage example
 //# sourceMappingURL=sendTransaction.js.map

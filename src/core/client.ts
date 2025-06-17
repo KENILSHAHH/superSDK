@@ -3,6 +3,9 @@ import {  SDKOptions } from "../types";
 import { getAggregatedBalance } from "../methods/getAggregatedBalance";
 import { Address, Chain } from "viem";
 import { sendETH } from "../methods/sendETH";
+import { sendTransaction } from "../methods/sendTransaction";
+
+
 export class superSDK {
   private chains: Chain[];
   constructor(options?: SDKOptions) {
@@ -33,6 +36,28 @@ export class superSDK {
     const tx = await sendETH(to, amount, chainId);
     return tx;
   }
+  
+  async sendTransaction(
+    contractAddress: Address,
+    chainId: number,
+    userAddress: Address,
+    functionName: string,
+    functionParams: any[],
+    abi: any,
+    value?: bigint
+  ): Promise<string> {
+    await sendTransaction({
+      contractAddress,
+      chainId,
+      userAddress,
+      functionName,
+      functionParams,
+      abi,
+      value: value ?? 0n,
+    });
+    throw new Error("Method not implemented.");
+  }
+  
     
 
 }
